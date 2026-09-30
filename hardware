@@ -1,0 +1,71 @@
+#include <Arduino.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+#include "secrets.h" // Local file containing WIFI_SSID & WIFI_PASSWORD
+
+const unsigned long POST_INTERVAL_MS = 5000;
+unsigned long lastPostTime = 0;
+
+void connectToWiFi() {
+    Serial.print("Connecting to Wi-Fi: ");
+    Serial.println(WIFI_SSID);
+    
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    
+    Serial.println("\nWi-Fi Connected!");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.localIP());
+}
+
+void postTelemetryData() {
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Wi-Fi disconnected. Reconnecting...");
+        connectToWiFi();
+        return;
+    }
+
+    HTTPClient http;
+    http.begin(API_ENDPOINT);
+    http.addHeader("Content-Type", "application/json");
+
+    // Construct JSON Payload using ArduinoJson
+    StaticJsonDocument<200> doc;
+    doc["device_id"] = "ESP32-NODE-01";
+    doc["uptime_ms"] = millis();
+    doc["free_heap"] = ESP.getFreeHeap();
+    doc["wifi_rssi"] = WiFi.RSSI();
+
+    String jsonString;
+    serializeJson(doc, jsonString);
+
+    Serial.print("Sending Payload: ");
+    Serial.println(jsonString);
+
+    int httpResponseCode = http.POST(jsonString);
+
+    if (httpResponseCode > 0) {
+        Serial.printf("HTTP Response Code: %d\n", httpResponseCode);
+    } else {
+        Serial.printf("Error on sending POST: %s\n", http.errorToString(httpResponseCode).c_str());
+    }
+
+    http.end();
+}
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+    connectToWiFi();
+}
+
+void loop() {
+    if (millis() - lastPostTime >= POST_INTERVAL_MS) {
+        lastPostTime = millis();
+        postTelemetryData();
+    }
+}
