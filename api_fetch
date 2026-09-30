@@ -1,0 +1,49 @@
+// Function to fetch data from an API endpoint
+async function fetchDashboardData(endpointUrl) {
+    try {
+        const response = await fetch(endpointUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer YOUR_TOKEN_HERE' // Uncomment if API requires authorization
+            }
+        });
+
+        // 1. Check if the HTTP response status code is OK (200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        // 2. Parse the body JSON stream
+        const data = await response.json();
+        
+        // 3. Return parsed data to caller
+        return data;
+
+    } catch (error) {
+        // Handle network errors or thrown response errors
+        console.error('Failed to fetch data:', error.message);
+        throw error;
+    }
+}
+
+// Example Usage:
+async function loadDataIntoUI() {
+    const apiUrl = 'https://jsonplaceholder.typicode.com/todos/1'; // Sample API endpoint
+
+    try {
+        console.log('Fetching data...');
+        const result = await fetchDashboardData(apiUrl);
+        
+        console.log('Data received:', result);
+        // Execute UI update functions here with the returned data
+        // updateUI(result);
+
+    } catch (err) {
+        // Render fallback error UI to the user
+        console.error('Displaying fallback UI due to error.');
+    }
+}
+
+// Call the function
+loadDataIntoUI();
