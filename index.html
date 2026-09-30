@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EmergencyLink | Ambulance Coordination</title>
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <!-- Leaflet -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-truck-medical"></i>
+            </div>
+
+            <div>
+                <h2>EmergencyLink</h2>
+                <span>Smart Emergency Network</span>
+            </div>
+        </div>
+
+        <div class="side-section-title">
+            OPERATIONS
+        </div>
+
+        <nav class="navigation">
+
+            <button class="nav-item active" data-page="dashboard">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+            </button>
+
+            <button class="nav-item" data-page="emergency">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Live Emergency</span>
+                <b class="nav-count">3</b>
+            </button>
+
+            <button class="nav-item" data-page="ambulances">
+                <i class="fa-solid fa-truck-medical"></i>
+                <span>Ambulances</span>
+            </button>
+
+            <button class="nav-item" data-page="hospitals">
+                <i class="fa-solid fa-hospital"></i>
+                <span>Hospital Network</span>
+            </button>
+
+            <button class="nav-item" data-page="dag">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>DAG Workflow</span>
+            </button>
+
+        </nav>
+
+        <div class="side-section-title">
+            MONITORING
+        </div>
+
+        <nav class="navigation">
+
+            <button class="nav-item" data-page="analytics">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </button>
+
+            <button class="nav-item" data-page="audit">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Audit Logs</span>
+            </button>
+
+            <button class="nav-item" data-page="settings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>System Online</strong>
+                    <small>All services operational</small>
+                </div>
+            </div>
+
+            <div class="user-card">
+                <div class="avatar">OP</div>
+
+                <div>
+                    <strong>Operator</strong>
+                    <small>Emergency Control</small>
+                </div>
+
+                <i class="fa-solid fa-ellipsis"></i>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div class="mobile-menu" id="mobileMenu">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
+            <div class="page-heading">
+
+                <span class="live-indicator">
+                    <span></span>
+                    LIVE
+                </span>
+
+                <div>
+                    <h1 id="pageTitle">Emergency Dashboard</h1>
+                    <p id="pageSubtitle">
+                        Real-time ambulance and hospital coordination
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="top-actions">
+
+                <!-- LOCATION -->
+
+                <div class="location-control">
+
+                    <div class="location-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+
+                    <div class="location-text">
+                        <small>Operations Zone</small>
+                        <strong id="locationName">
+                            Pune Central
+                        </strong>
+                    </div>
+
+                    <button id="locateBtn" title="Use my location">
+                        <i class="fa-solid fa-crosshairs"></i>
+                    </button>
+
+                </div>
+
+
+                <button class="notification-btn">
+                    <i class="fa-regular fa-bell"></i>
+                    <span></span>
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CONTENT ================= -->
+
+        <section class="content">
+
+
+            <!-- ================================================= -->
+            <!-- DASHBOARD -->
+            <!-- ================================================= -->
+
+            <div class="page active-page" id="dashboard">
+
+                <div class="emergency-banner">
+
+                    <div class="emergency-left">
+
+                        <div class="emergency-pulse">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+
+                        <div>
+                            <span>ACTIVE EMERGENCY</span>
+                            <h3 id="bannerEmergencyId">
+                                EM-2048 · Critical
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <div class="banner-info">
+
+                        <div>
+                            <small>Ambulance</small>
+                            <strong id="bannerAmbulance">
+                                MH-12-AB-2048
+                            </strong>
+                        </div>
+
+                        <div>
+                            <small>ETA</small>
+                            <strong id="bannerEta">
+                                06 min
+                            </strong>
+                        </div>
+
+                        <div>
+                            <small>Destination</small>
+                            <strong id="bannerDestination">
+                                Select Hospital
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- STAT CARDS -->
+
+                <div class="stats-grid">
+
+                    <div class="stat-card red-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+
+                        <div>
+                            <span>Active Emergencies</span>
+                            <h2>03</h2>
+                            <small class="up">
+                                <i class="fa-solid fa-arrow-up"></i>
+                                12% today
+                            </small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card blue-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-truck-medical"></i>
+                        </div>
+
+                        <div>
+                            <span>Ambulances En Route</span>
+                            <h2>08</h2>
+                            <small>2 critical</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card green-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-hospital"></i>
+                        </div>
+
+                        <div>
+                            <span>Hospitals Ready</span>
+                            <h2>11</h2>
+                            <small>of 14 hospitals</small>
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-card purple-card">
+
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-stopwatch"></i>
+                        </div>
+
+                        <div>
+                            <span>Average ETA</span>
+                            <h2>08:42</h2>
+                            <small class="up">
+                                <i class="fa-solid fa-arrow-down"></i>
+                                8% improved
+                            </small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MAP SECTION -->
+
+                <div class="dashboard-grid">
+
+                    <div class="map-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <h2>Live Operations Map</h2>
+                                <p>
+                                    Ambulance location and selected hospital destination
+                                </p>
+                            </div>
+
+                            <div class="map-actions">
+
+                                <button id="fitRouteBtn" class="small-action">
+                                    <i class="fa-solid fa-route"></i>
+                                    Show Route
+                                </button>
+
+                                <button id="mapLocateBtn" class="small-action">
+                                    <i class="fa-solid fa-crosshairs"></i>
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="map-wrapper">
+
+                            <div id="map"></div>
+
+
+                            <!-- MAP LEGEND -->
+
+                            <div class="map-legend">
+
+                                <div>
+                                    <span class="legend-dot ambulance-dot">
+                                        <i class="fa-solid fa-truck-medical"></i>
+                                    </span>
+                                    Ambulance
+                                </div>
+
+                                <div>
+                                    <span class="legend-dot patient-dot"></span>
+                                    Patient
+                                </div>
+
+                                <div>
+                                    <span class="legend-dot hospital-dot"></span>
+                                    Hospital
+                                </div>
+
+                                <div>
+                                    <span class="legend-line"></span>
+                                    Selected Route
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SELECTED HOSPITAL -->
+
+                    <div class="details-card">
+
+                        <div class="card-header">
+
+                            <div>
+                                <h2>Hospital Network</h2>
+                                <p>Select a hospital to set destination</p>
+                            </div>
+
+                            <span class="network-status">
+                                <span></span>
+                                LIVE
+                            </span>
+
+                        </div>
+
+
+                        <div class="hospital-list" id="hospitalList">
+
+                            <!-- JS inserts hospitals -->
+
+                        </div>
+
+
+                        <div class="selected-hospital" id="selectedHospitalBox">
+
+                            <div class="selected-title">
+                                <span>
+                                    SELECTED DESTINATION
+                                </span>
+
+                                <i class="fa-solid fa-location-arrow"></i>
+                            </div>
+
+                            <h3 id="selectedHospitalName">
+                                No hospital selected
+                            </h3>
+
+                            <div class="selected-details">
+
+                                <div>
+                                    <i class="fa-solid fa-bed"></i>
+                                    <span id="selectedBeds">
+                                        Select hospital
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <i class="fa-solid fa-clock"></i>
+                                    <span id="selectedEta">
+                                        —
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <i class="fa-solid fa-route"></i>
+                                    <span id="selectedDistance">
+                                        —
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            <!-- CONDITION BASED DISPATCH BUTTON -->
+
+                            <button
+                                id="dispatchBtn"
+                                class="dispatch-btn disabled"
+                                disabled
+                            >
+                                <i class="fa-solid fa-truck-medical"></i>
+
+                                <span id="dispatchText">
+                                    Select Hospital
+                                </span>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT ACTIVITY -->
+
+                <div class="activity-card">
+
+                    <div class="card-header">
+
+                        <div>
+                            <h2>Recent Emergency Activity</h2>
+                            <p>Latest system events</p>
+                        </div>
+
+                        <button
+                            class="text-btn"
+                            data-page="audit"
+                        >
+                            View all
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+
+                    </div>
+
+                    <div id="recentActivity"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- LIVE EMERGENCY -->
+            <!-- ================================================= -->
+
+            <div class="page" id="emergency">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>Live Emergency Control</h2>
+                        <p>Manage active emergency requests</p>
+                    </div>
+
+                    <button class="primary-btn" id="newEmergencyBtn">
+                        <i class="fa-solid fa-plus"></i>
+                        New Emergency
+                    </button>
+
+                </div>
+
+
+                <div class="emergency-control-card">
+
+                    <div class="emergency-header">
+
+                        <div class="critical-badge">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            CRITICAL
+                        </div>
+
+                        <span class="emergency-id">
+                            EM-2048
+                        </span>
+
+                    </div>
+
+                    <div class="emergency-control-grid">
+
+                        <div>
+                            <small>Patient</small>
+                            <strong>Patient #P-2048</strong>
+                        </div>
+
+                        <div>
+                            <small>Ambulance</small>
+                            <strong>MH-12-AB-2048</strong>
+                        </div>
+
+                        <div>
+                            <small>Current Status</small>
+                            <strong id="emergencyStatus">
+                                Awaiting Hospital
+                            </strong>
+                        </div>
+
+                        <div>
+                            <small>Destination</small>
+                            <strong id="emergencyDestination">
+                                Not selected
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="emergency-actions">
+
+                        <button class="condition-btn accept" id="acceptBtn">
+                            <i class="fa-solid fa-check"></i>
+                            Accept
+                        </button>
+
+                        <button class="condition-btn dispatch" id="emergencyDispatchBtn">
+                            <i class="fa-solid fa-truck-medical"></i>
+                            Dispatch
+                        </button>
+
+                        <button class="condition-btn arrive" id="arriveBtn">
+                            <i class="fa-solid fa-location-dot"></i>
+                            Mark Arrived
+                        </button>
+
+                        <button class="condition-btn complete" id="completeBtn">
+                            <i class="fa-solid fa-handshake"></i>
+                            Complete Handover
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="workflow-mini">
+
+                    <div class="workflow-step completed">
+                        <span>1</span>
+                        Request
+                    </div>
+
+                    <div class="workflow-connector"></div>
+
+                    <div class="workflow-step completed">
+                        <span>2</span>
+                        Accepted
+                    </div>
+
+                    <div class="workflow-connector"></div>
+
+                    <div class="workflow-step active">
+                        <span>3</span>
+                        Dispatch
+                    </div>
+
+                    <div class="workflow-connector"></div>
+
+                    <div class="workflow-step">
+                        <span>4</span>
+                        Arrival
+                    </div>
+
+                    <div class="workflow-connector"></div>
+
+                    <div class="workflow-step">
+                        <span>5</span>
+                        Handover
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- AMBULANCES -->
+            <!-- ================================================= -->
+
+            <div class="page" id="ambulances">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>Ambulance Fleet</h2>
+                        <p>Real-time fleet availability</p>
+                    </div>
+
+                    <div class="filter-group">
+
+                        <button class="filter active">
+                            All
+                        </button>
+
+                        <button class="filter">
+                            Available
+                        </button>
+
+                        <button class="filter">
+                            En Route
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="ambulance-grid" id="ambulanceGrid"></div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- HOSPITALS -->
+            <!-- ================================================= -->
+
+            <div class="page" id="hospitals">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>Hospital Network</h2>
+                        <p>Capacity, readiness and emergency resources</p>
+                    </div>
+
+                    <div class="hospital-search">
+
+                        <i class="fa-solid fa-search"></i>
+
+                        <input
+                            id="hospitalSearch"
+                            type="text"
+                            placeholder="Search hospital..."
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="network-summary"
+                    id="networkSummary"
+                ></div>
+
+
+                <div
+                    class="hospital-network-grid"
+                    id="hospitalNetworkGrid"
+                ></div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- DAG -->
+            <!-- ================================================= -->
+
+            <div class="page" id="dag">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>DAG Workflow</h2>
+                        <p>
+                            Dependency-based emergency coordination
+                        </p>
+                    </div>
+
+                    <button
+                        class="primary-btn"
+                        id="advanceDagBtn"
+                    >
+                        <i class="fa-solid fa-forward"></i>
+                        Advance Workflow
+                    </button>
+
+                </div>
+
+
+                <div class="dag-card">
+
+                    <div class="dag-description">
+
+                        <div class="dag-info-icon">
+                            <i class="fa-solid fa-diagram-project"></i>
+                        </div>
+
+                        <div>
+                            <h3>Emergency Coordination DAG</h3>
+
+                            <p>
+                                Parallel tasks allow clinical information,
+                                hospital preparation and route/ETA processing
+                                to progress independently where dependencies
+                                permit.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="dag-flow">
+
+                        <div
+                            class="dag-node completed"
+                            data-step="accept"
+                        >
+                            <span>1</span>
+                            <i class="fa-solid fa-hospital"></i>
+                            <strong>Hospital Accepted</strong>
+                            <small>Completed</small>
+                        </div>
+
+
+                        <div class="dag-arrow">
+                            ↓
+                        </div>
+
+
+                        <div
+                            class="dag-node completed"
+                            data-step="reserve"
+                        >
+                            <span>2</span>
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                            <strong>Reserve Resources</strong>
+                            <small>Completed</small>
+                        </div>
+
+
+                        <div class="dag-arrow">
+                            ↓
+                        </div>
+
+
+                        <div class="dag-parallel">
+
+                            <div
+                                class="dag-node running"
+                                data-step="data"
+                            >
+                                <span>3A</span>
+                                <i class="fa-solid fa-file-medical"></i>
+                                <strong>Transmit Patient Data</strong>
+                                <small>Running</small>
+                            </div>
+
+
+                            <div
+                                class="dag-node running"
+                                data-step="prepare"
+                            >
+                                <span>3B</span>
+                                <i class="fa-solid fa-user-doctor"></i>
+                                <strong>Prepare Emergency Team</strong>
+                                <small>Running</small>
+                            </div>
+
+
+                            <div
+                                class="dag-node running"
+                                data-step="route"
+                            >
+                                <span>3C</span>
+                                <i class="fa-solid fa-route"></i>
+                                <strong>Route + ETA</strong>
+                                <small>Running</small>
+                            </div>
+
+                        </div>
+
+
+                        <div class="dag-arrow">
+                            ↓
+                        </div>
+
+
+                        <div
+                            class="dag-node pending"
+                            data-step="arrival"
+                        >
+                            <span>4</span>
+                            <i class="fa-solid fa-truck-medical"></i>
+                            <strong>Ambulance Arrival</strong>
+                            <small>Pending</small>
+                        </div>
+
+
+                        <div class="dag-arrow">
+                            ↓
+                        </div>
+
+
+                        <div
+                            class="dag-node pending"
+                            data-step="handover"
+                        >
+                            <span>5</span>
+                            <i class="fa-solid fa-handshake"></i>
+                            <strong>Patient Handover</strong>
+                            <small>Pending</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ANALYTICS -->
+            <!-- ================================================= -->
+
+            <div class="page" id="analytics">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>Analytics</h2>
+                        <p>Emergency response performance</p>
+                    </div>
+
+                </div>
+
+
+                <div class="analytics-grid">
+
+                    <div class="analytics-card large">
+                        <h3>Average Response Time</h3>
+
+                        <div class="chart-placeholder">
+
+                            <div class="bar" style="height:60%">
+                                <span>Mon</span>
+                            </div>
+
+                            <div class="bar" style="height:48%">
+                                <span>Tue</span>
+                            </div>
+
+                            <div class="bar" style="height:72%">
+                                <span>Wed</span>
+                            </div>
+
+                            <div class="bar" style="height:44%">
+                                <span>Thu</span>
+                            </div>
+
+                            <div class="bar" style="height:52%">
+                                <span>Fri</span>
+                            </div>
+
+                            <div class="bar" style="height:35%">
+                                <span>Sat</span>
+                            </div>
+
+                            <div class="bar" style="height:42%">
+                                <span>Sun</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="analytics-card">
+
+                        <h3>Hospital Readiness</h3>
+
+                        <div class="readiness-ring">
+
+                            <div>
+                                <strong>79%</strong>
+                                <span>Ready</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="analytics-card">
+
+                        <h3>Emergency Types</h3>
+
+                        <div class="analytics-list">
+
+                            <div>
+                                <span class="dot red"></span>
+                                Critical
+                                <strong>42%</strong>
+                            </div>
+
+                            <div>
+                                <span class="dot orange"></span>
+                                Urgent
+                                <strong>35%</strong>
+                            </div>
+
+                            <div>
+                                <span class="dot blue"></span>
+                                Standard
+                                <strong>23%</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- AUDIT -->
+            <!-- ================================================= -->
+
+            <div class="page" id="audit">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>Audit Logs</h2>
+                        <p>Traceable emergency workflow events</p>
+                    </div>
+
+                    <button
+                        class="primary-btn"
+                        id="exportLogsBtn"
+                    >
+                        <i class="fa-solid fa-download"></i>
+                        Export CSV
+                    </button>
+
+                </div>
+
+
+                <div class="audit-card">
+
+                    <div class="audit-search">
+
+                        <i class="fa-solid fa-search"></i>
+
+                        <input
+                            id="auditSearch"
+                            type="text"
+                            placeholder="Search audit logs..."
+                        >
+
+                    </div>
+
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Event</th>
+                                    <th>Entity</th>
+                                    <th>Status</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="auditTable"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- SETTINGS -->
+            <!-- ================================================= -->
+
+            <div class="page" id="settings">
+
+                <div class="page-top">
+
+                    <div>
+                        <h2>System Settings</h2>
+                        <p>Configure operator preferences</p>
+                    </div>
+
+                </div>
+
+
+                <div class="settings-card">
+
+                    <div class="setting-row">
+
+                        <div>
+                            <strong>Emergency Notifications</strong>
+                            <small>
+                                Receive alerts for critical emergencies
+                            </small>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span></span>
+                        </label>
+
+                    </div>
+
+
+                    <div class="setting-row">
+
+                        <div>
+                            <strong>Automatic ETA Updates</strong>
+                            <small>
+                                Refresh ambulance ETA automatically
+                            </small>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span></span>
+                        </label>
+
+                    </div>
+
+
+                    <div class="setting-row">
+
+                        <div>
+                            <strong>Sound Alerts</strong>
+                            <small>
+                                Play sound for critical events
+                            </small>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span></span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div class="toast" id="toast">
+
+    <i class="fa-solid fa-circle-check"></i>
+
+    <div>
+        <strong id="toastTitle">Success</strong>
+        <span id="toastMessage">Action completed</span>
+    </div>
+
+</div>
+
+
+<!-- Leaflet JS -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
